@@ -19,13 +19,6 @@ namespace ict_technical_WebAPI.Controllers
         {
             _context = context;
         }
-
-        // GET: api/product_infos
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<product_info>>> Getproduct_infos()
-        {
-            return await _context.product_info.ToListAsync();
-        }
         [Route("Getproduct_infosWithUpDatePrice")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<dynamic>>> Getproduct_infosWithUpDatePrice()
@@ -56,7 +49,7 @@ namespace ict_technical_WebAPI.Controllers
                        ) on pr.product_id equals cc.product_id into cpgrp
                        from cp in cpgrp.DefaultIfEmpty()
                       
-                       select new { product.product_id, product.product_name, DicountPrice= (pr.product_current_price),cp};
+                       select new { product.product_id, product.product_name, DicountPrice= (pr.product_current_price-cp?.campaign_discount??0)};
 
 
             return data.ToList();
@@ -79,6 +72,7 @@ namespace ict_technical_WebAPI.Controllers
                 product_id = product_id,
                 product_current_price=pvm.CurrentPrice,
                 product_price_upload_date=DateTime.Now,
+                remarks=pvm.Remarks
             };
             _context.product_price.Add(product_Price);
             try
